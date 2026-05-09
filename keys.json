@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "app": "buddy-ai",
+  "description": "License key registry for Buddy AI student ID builder",
+  "keys": [
+    {
+      "hash": "5d0d2e74bf98da7b48a1c4c080abad06344ddaace51d3affc0cc6a375275305a",
+      "recipient": "(unassigned #1)",
+      "status": "available"
+    },
+    {
+      "hash": "e9cb0114f179edf8a2ccce3ed6f5c6ec89b0d4d62e6a98180d9bcecdd4094a23",
+      "recipient": "(unassigned #2)",
+      "status": "available"
+    },
+    {
+      "hash": "9d6046892db97d7d823c8c173b85165f47d6904e8c6a79d197d6ab3ac91f1631",
+      "recipient": "(unassigned #3)",
+      "status": "available"
+    },
+    {
+      "hash": "f0df287ee591b78f5bd7598ee4b19a1be79639c99ae56b214f11c25d3390b735",
+      "recipient": "(unassigned #4)",
+      "status": "available"
+    },
+    {
+      "hash": "56279856741dba4189d7a26d884acc8fc27eaa5be5c6728b6700ee8c28a79dd3",
+      "recipient": "(unassigned #5)",
+      "status": "available"
+    },
+    {
+      "hash": "de37ee6f7561710da9d1f2b8a71e3172e9d86b15fe7563f717117e63dfea3f09",
+      "recipient": "(unassigned #6)",
+      "status": "available"
+    },
+    {
+      "hash": "c0e59acdcf816b92168885f4bb0cfa75a76418faef73275a236df3f9c14a9fd0",
+      "recipient": "(unassigned #7)",
+      "status": "available"
+    },
+    {
+      "hash": "91ffadab15f1595e9a346db926884451601d5791fed0e77434010b1d032a1be5",
+      "recipient": "(unassigned #8)",
+      "status": "available"
+    },
+    {
+      "hash": "5b6c2d764ba8fb4da91af518150793eb1554179adad15112535946e69add1568",
+      "recipient": "(unassigned #9)",
+      "status": "available"
+    },
+    {
+      "hash": "cc2be30cb63df0abd44a0fbe5ec81617e19e765502adbd34c0c8fc0cf6c3e90d",
+      "recipient": "(unassigned #10)",
+      "status": "available"
+    }
+  ],
+  "activations": []
+}

@@ -1,0 +1,129 @@
+name: Activate License
+
+# Triggered by Buddy AI app when a user enters their key.
+# Validates the key against keys.json and binds it to the device on success.
+#
+# Reads:
+#   github.event.client_payload.key_hash
+#   github.event.client_payload.device_id
+#   github.event.client_payload.device_name
+#
+# Writes:
+#   results/<key_hash>.json — activation result the app polls for
+#   keys.json (updated to mark key as used)
+
+on:
+  repository_dispatch:
+    types: [activate]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate and update
+        id: validate
+        run: |
+          mkdir -p results
+          node <<'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          const keyHash = process.env.KEY_HASH;
+          const deviceId = process.env.DEVICE_ID;
+          const deviceName = process.env.DEVICE_NAME || 'Unknown device';
+          const ts = Date.now();
+
+          if (!keyHash || !deviceId) {
+            console.log('Missing required fields');
+            process.exit(0);
+          }
+
+          const keysPath = 'keys.json';
+          const data = JSON.parse(fs.readFileSync(keysPath, 'utf8'));
+          const entry = (data.keys || []).find((k) => k.hash === keyHash);
+
+          const writeResult = (result) => {
+            fs.writeFileSync(
+              path.join('results', `${keyHash}.json`),
+              JSON.stringify(result, null, 2) + '\n'
+            );
+          };
+
+          if (!entry) {
+            writeResult({ status: 'rejected', reason: 'Key not found.', ts, device_id: deviceId });
+            console.log('Key not found in registry');
+            return;
+          }
+
+          // Find any prior activation
+          data.activations = data.activations || [];
+          const prior = data.activations.find((a) => a.hash === keyHash);
+
+          if (prior) {
+            if (prior.device_id === deviceId) {
+              // Same device re-activating (e.g. reinstall) — allow
+              writeResult({
+                status: 'activated',
+                recipient: entry.recipient,
+                device_id: deviceId,
+                ts,
+                note: 'Re-activation on same device',
+              });
+              console.log('Re-activation accepted');
+              return;
+            } else {
+              writeResult({
+                status: 'rejected',
+                reason: 'This key is already in use on a different device. Contact admin to release it.',
+                ts,
+                device_id: deviceId,
+              });
+              console.log('Key already bound to a different device');
+              return;
+            }
+          }
+
+          // Fresh activation — bind the key
+          entry.status = 'used';
+          data.activations.push({
+            hash: keyHash,
+            device_id: deviceId,
+            device_name: deviceName,
+            activated_at: new Date().toISOString(),
+          });
+
+          fs.writeFileSync(keysPath, JSON.stringify(data, null, 2) + '\n');
+          writeResult({
+            status: 'activated',
+            recipient: entry.recipient,
+            device_id: deviceId,
+            ts,
+          });
+          console.log('Activation successful');
+          EOF
+        env:
+          KEY_HASH: ${{ github.event.client_payload.key_hash }}
+          DEVICE_ID: ${{ github.event.client_payload.device_id }}
+          DEVICE_NAME: ${{ github.event.client_payload.device_name }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "Buddy AI License Bot"
+          git config user.email "bot@buddy.ai"
+          git add keys.json results/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Activation event: ${KEY_HASH:0:12}"
+            git push
+          fi
+        env:
+          KEY_HASH: ${{ github.event.client_payload.key_hash }}
