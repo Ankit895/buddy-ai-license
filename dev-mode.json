@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "comment": "Devices listed here bypass the license screen in Buddy AI. Add a Device ID (visible on the License screen of an installed APK, or in Settings → This device after activation) to enable dev mode for that device. Schools you ship to should NEVER appear in this list.",
+  "enabledDevices": [
+  ],
+  "lastUpdated": "2026-05-10"
+}
